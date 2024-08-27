@@ -1,17 +1,15 @@
 const express = require('express');
 const http = require('http');
-const socketIo = require('socket.io');
-const cors = require('cors');
-
+const { Server } = require('socket.io');
 const app = express();
 
-// Middleware
-app.use(cors({ origin: '*' }));
-app.use(express.json());
+const port = process.env.PORT || 3000;
 const server = http.createServer(app);
-const io = socketIo(server, {
-    transports: ['websocket'],
-    upgrade: false,
+
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+    },
 });
 let gameState = {
     board: [

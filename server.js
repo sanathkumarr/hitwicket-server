@@ -1,16 +1,19 @@
+
 const express = require('express');
 const http = require('http');
-const { Server } = require('socket.io');
+const socketIo = require('socket.io');
+const cors = require('cors'); // Add this line
+
 const app = express();
-
-const port = process.env.PORT || 3000;
 const server = http.createServer(app);
+const io = socketIo(server);
 
-const io = new Server(server, {
-    cors: {
-        origin: "*",
-    },
-});
+// Configure CORS
+app.use(cors({
+  origin: 'https://hitwicket-client.vercel.app/', // Replace with your client URL
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type'],
+}));
 let gameState = {
     board: [
         ['A-P1', 'A-H1', 'A-H2', 'A-H1', 'A-P1'],

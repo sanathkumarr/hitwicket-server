@@ -1,18 +1,19 @@
+
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const cors = require('cors');
 
 const app = express();
-
-// Middleware
 app.use(cors({ origin: '*' }));
 app.use(express.json());
+
 const server = http.createServer(app);
 const io = socketIo(server, {
     transports: ['websocket'],
     upgrade: false,
 });
+
 let gameState = {
     board: [
         ['A-P1', 'A-H1', 'A-H2', 'A-H1', 'A-P1'],
@@ -27,12 +28,14 @@ let gameState = {
     chat: [],
     players: {}, 
 };
+
 const addPlayer = (socket) => {
     const playerId = socket.id;
     const username = `Player${Object.keys(gameState.players).length + 1}`;
     gameState.players[playerId] = { id: playerId, username };
     return username;
 };
+
 io.on('connection', (socket) => {
     socket.on('join-game', () => {
         const username = addPlayer(socket);
@@ -81,6 +84,5 @@ io.on('connection', (socket) => {
         console.log('A user disconnected');
     });
 });
-server.listen(5000, () => {
-    console.log('Server is running on port 5000');
-});
+
+module.exports = server;

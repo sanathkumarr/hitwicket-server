@@ -1,18 +1,28 @@
-
+const path = require('path');
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const cors = require('cors');
 
 const app = express();
-app.use(cors({ origin: '*' }));
+
+app.use(cors({
+    origin: ['https://hitwicket-client.vercel.app'], // Replace with your Vercel app URL
+    methods: ['GET', 'POST'],
+    credentials: true,
+}));
 app.use(express.json());
+
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, 'client/build')));
 
 const server = http.createServer(app);
 const io = socketIo(server, {
     transports: ['websocket'],
     upgrade: false,
 });
+
+
 
 let gameState = {
     board: [
@@ -84,5 +94,11 @@ io.on('connection', (socket) => {
         console.log('A user disconnected');
     });
 });
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname + '/client/build/index.html'));
+});
 
-module.exports = server;
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
